@@ -26,6 +26,11 @@ type V5WebsocketPublicServiceI interface {
 		func(V5WebsocketPublicOrderBookResponse) error,
 	) (func() error, error)
 
+	SubscribeTicker(
+		V5WebsocketPublicTickerParamKey,
+		func(V5WebsocketPublicTickerResponse) error,
+	) (func() error, error)
+
 	SubscribeKline(
 		V5WebsocketPublicKlineParamKey,
 		func(V5WebsocketPublicKlineResponse) error,
@@ -40,6 +45,7 @@ type V5WebsocketPublicService struct {
 	mu sync.Mutex
 
 	paramOrderBookMap map[V5WebsocketPublicOrderBookParamKey]func(V5WebsocketPublicOrderBookResponse) error
+	paramTickerMap    map[V5WebsocketPublicTickerParamKey]func(V5WebsocketPublicTickerResponse) error
 	paramKlineMap     map[V5WebsocketPublicKlineParamKey]func(V5WebsocketPublicKlineResponse) error
 }
 
@@ -60,6 +66,9 @@ const (
 	// V5WebsocketPublicTopicOrderBook :
 	V5WebsocketPublicTopicOrderBook = "orderbook"
 
+	// V5WebsocketPublicTopicTicker :
+	V5WebsocketPublicTopicTicker = "ticker"
+
 	// V5WebsocketPublicTopicKline :
 	V5WebsocketPublicTopicKline = "kline"
 )
@@ -72,6 +81,8 @@ func (s *V5WebsocketPublicService) judgeTopic(respBody []byte) (V5WebsocketPubli
 	}
 	if topic, ok := parsedData["topic"].(string); ok {
 		switch {
+		case strings.Contains(topic, "ticker"):
+			return V5WebsocketPublicTopicTicker, nil
 		case strings.Contains(topic, "orderbook"):
 			return V5WebsocketPublicTopicOrderBook, nil
 		case strings.Contains(topic, "kline"):
@@ -163,6 +174,20 @@ func (s *V5WebsocketPublicService) Run() error {
 		if err != nil {
 			return err
 		}
+		if err := f(resp); err != nil {
+			return err
+		}
+	case V5WebsocketPublicTopicTicker:
+		var resp V5WebsocketPublicTickerResponse
+		if err := s.parseResponse(message, &resp); err != nil {
+			return err
+		}
+
+		f, err := s.retrieveTickerFunc(resp.Key())
+		if err != nil {
+			return err
+		}
+
 		if err := f(resp); err != nil {
 			return err
 		}

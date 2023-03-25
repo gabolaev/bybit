@@ -26,6 +26,7 @@ func (s *V5WebsocketService) Public(category CategoryV5) (V5WebsocketPublicServi
 		client:            s.client,
 		connection:        c,
 		paramOrderBookMap: make(map[V5WebsocketPublicOrderBookParamKey]func(V5WebsocketPublicOrderBookResponse) error),
+		paramTickerMap:    make(map[V5WebsocketPublicTickerParamKey]func(V5WebsocketPublicTickerResponse) error),
 		paramKlineMap:     make(map[V5WebsocketPublicKlineParamKey]func(V5WebsocketPublicKlineResponse) error),
 	}, nil
 }
