@@ -67,7 +67,7 @@ const (
 	V5WebsocketPublicTopicOrderBook = "orderbook"
 
 	// V5WebsocketPublicTopicTicker :
-	V5WebsocketPublicTopicTicker = "ticker"
+	V5WebsocketPublicTopicTicker = "tickers"
 
 	// V5WebsocketPublicTopicKline :
 	V5WebsocketPublicTopicKline = "kline"
@@ -81,7 +81,7 @@ func (s *V5WebsocketPublicService) judgeTopic(respBody []byte) (V5WebsocketPubli
 	}
 	if topic, ok := parsedData["topic"].(string); ok {
 		switch {
-		case strings.Contains(topic, "ticker"):
+		case strings.Contains(topic, "tickers"):
 			return V5WebsocketPublicTopicTicker, nil
 		case strings.Contains(topic, "orderbook"):
 			return V5WebsocketPublicTopicOrderBook, nil

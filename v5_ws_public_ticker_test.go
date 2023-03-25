@@ -11,7 +11,7 @@ import (
 
 func TestWebsocketV5Public_Ticker(t *testing.T) {
 	respBody := map[string]interface{}{
-		"topic": "ticker.BTCUSDT",
+		"topic": "tickers.BTCUSDT",
 		"type":  "snapshot",
 		"ts":    1672324988882,
 		"data": []map[string]interface{}{
